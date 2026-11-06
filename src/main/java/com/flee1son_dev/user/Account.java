@@ -62,4 +62,9 @@ public class Account {
         this.moneyAmount = moneyAmount;
     }
 
+    @Override
+    public String toString() {
+        return "Account [id=" + id + ", userId=" + userId + ", moneyAmount=" + moneyAmount + "]";
+    }
+
 }

@@ -43,8 +43,8 @@ public class AccountTransferCommand implements OperationCommand{
         }
         accountService.transferAccount(senderAccountId, senderAccountId, amount);
         System.out.println(
-            "Amount " + amount + "transferred from account's ID " + 
-            senderAccountId + "from to account's ID " + recipiesAccountId
+            "Amount " + amount + " transferred from account's ID " + 
+            senderAccountId + "from to account's ID " + recipiesAccountId + "\n"
         );
     }
 

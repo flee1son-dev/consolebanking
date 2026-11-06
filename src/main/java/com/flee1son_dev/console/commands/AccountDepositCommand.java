@@ -36,7 +36,7 @@ public class AccountDepositCommand implements OperationCommand{
             return;
         }
         accountService.depositAccount(id, depositAmount);
-        System.out.println("Account with ID " + id + " has been deposited amount " + depositAmount);
+        System.out.println("Account with ID " + id + " has been deposited amount " + depositAmount + "\n");
     }
 
     @Override 

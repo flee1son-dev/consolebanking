@@ -34,7 +34,7 @@ public class AccountWithdrawCommand implements OperationCommand{
         }
 
         accountService.withdrawAccount(id, amount);
-        System.out.println("Amount " + amount + " from account ID " + id + "has been withdrawed");
+        System.out.println("Amount " + amount + " from account ID " + id + "has been withdrawed \n");
     }
 
     @Override

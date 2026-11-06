@@ -27,7 +27,7 @@ public class AccountCreateCommand implements OperationCommand{
             return; 
         }
         var account = accountService.createAccount(id);
-        System.out.println("Account created: " + account);
+        System.out.println("Account created: " + account.toString() + "\n");
     }
 
     @Override 

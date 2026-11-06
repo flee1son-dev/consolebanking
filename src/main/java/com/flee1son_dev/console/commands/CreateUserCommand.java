@@ -21,13 +21,12 @@ public class CreateUserCommand implements OperationCommand{
     public void execute(){
         System.out.print("Enter the user's login: ");
         String login = scanner.nextLine().trim();
-        scanner.nextLine();
         if(login.isEmpty() || login.isBlank()) {
             System.out.println("Login cannot must be empty or blank");
             return;
         }
         var user = userService.createUser(login);
-        System.out.println("User created: " + user);
+        System.out.println("User created: " + user.toString() + "\n");
     }
 
     @Override 

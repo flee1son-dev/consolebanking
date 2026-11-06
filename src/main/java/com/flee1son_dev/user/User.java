@@ -40,5 +40,10 @@ public class User {
         this.accounts = accounts;
     }
 
+    @Override
+    public String toString() {
+        return "\n User [id=" + id + ", login=" + login + ", accounts=" + accounts + "\n]";
+    }
+
 
 }
