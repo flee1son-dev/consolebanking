@@ -2,12 +2,16 @@ package com.flee1son_dev.user;
 
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+
 
 public class User {
+    @Nonnull 
     private Long id;
-
+    @Nonnull 
     private String login;
-
+    @Nullable 
     private List<Account> accounts;
 
     public User(Long id, String login, List<Account> accounts){

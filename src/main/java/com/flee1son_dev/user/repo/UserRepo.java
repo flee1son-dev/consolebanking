@@ -1,24 +1,20 @@
-package com.flee1son_dev.user;
+package com.flee1son_dev.user.repo;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Repository;
+
+import com.flee1son_dev.user.User;
 
 @Repository 
 public class UserRepo {
     private final Map<Long, User> usersById = new LinkedHashMap<>();
     private final Map<String, User> usersByLogin = new HashMap<>();
 
-    private final AtomicLong idGen = new AtomicLong();
-
-    public long nextId(){
-        return idGen.incrementAndGet();
-    }
 
 
     public void save(User u){
