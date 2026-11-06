@@ -54,7 +54,6 @@ public class AccountService {
         return account;
     }
 
-
     public void closeAccount(Long accountId) {
         var account = accountRepo.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException(accountId));
@@ -67,19 +66,23 @@ public class AccountService {
             throw new CannotCLoseLastAccountException();
         }
         if(account.getMoneyAmount() > 0){
-            var firstUserAccount = userAccounts.get(0);
-            var newAmount = firstUserAccount.getMoneyAmount() + account.getMoneyAmount();
-            firstUserAccount.setMoneyAmount(newAmount);
-            userAccounts.set(0, firstUserAccount);
+            var otherUserAccount = userAccounts.stream()
+                    .filter(a -> !a.getId().equals(accountId))
+                    .findFirst()
+                    .orElseThrow();
+            otherUserAccount.setMoneyAmount(otherUserAccount.getMoneyAmount() + account.getMoneyAmount());
+            accountRepo.save(otherUserAccount);
         }
-        userAccounts.remove(account);
+        userAccounts.removeIf(a -> a.getId().equals(accountId));
         accountRepo.close(accountId);
-
         userRepo.save(user);
     }
 
 
     public Account depositAccount(Long accountId, double deposit){
+        if(deposit < 0){
+            throw new NegativeMoneyAmountException();
+        }
         var account = accountRepo.findById(accountId).orElseThrow(
             () -> new AccountNotFoundException(accountId)
         );
@@ -105,7 +108,10 @@ public class AccountService {
         Long recipientAccountId,
         double transferAmount
     ){
-        if(senderAccountId == recipientAccountId){
+        if(transferAmount <= 0){
+            throw new NegativeMoneyAmountException();
+        }
+        if(senderAccountId.equals(recipientAccountId)){
             throw new AccountTransferException();
         }
         var senderAccount = accountRepo.findById(senderAccountId).orElseThrow(
@@ -121,39 +127,35 @@ public class AccountService {
         var recipientUser = userRepo.findById(recipientAccount.getUserId()).orElseThrow();
         var recipientUserAccounts = recipientUser.getAccounts();
 
-        int senderIdx = senderUserAccounts.indexOf(senderAccount);
-        int recipientIdx = recipientUserAccounts.indexOf(recipientAccount);
+        boolean sameOwner = senderAccount.getUserId().equals(recipientAccount.getUserId());
+
+        double comission = sameOwner ? 0 : transferAmount * accountProperties.getTransferComission();
 
         
-        var newSenderAmount = senderAccount.getId() == recipientAccount.getId() ? 
-                senderAccount.getMoneyAmount() - transferAmount :
-                senderAccount.getMoneyAmount() - (transferAmount * accountProperties.getTransferComission());
-
-        var newRecipientAmount = recipientAccount.getMoneyAmount() + transferAmount;
-        
+        var newSenderAmount = senderAccount.getMoneyAmount() - transferAmount - comission;
         if (newSenderAmount < 0) {
             throw new NegativeMoneyAmountException();
         }
-        if (newRecipientAmount < 0) {
-            throw new NegativeMoneyAmountException();
-        }
-        
+
+        var newRecipientAmount = recipientAccount.getMoneyAmount() + transferAmount;
         
         senderAccount.setMoneyAmount(newSenderAmount);
         recipientAccount.setMoneyAmount(newRecipientAmount);
-        senderUserAccounts.set(senderIdx, senderAccount);
-        recipientUserAccounts.set(recipientIdx, recipientAccount);
-
 
         accountRepo.save(senderAccount);
         accountRepo.save(recipientAccount);
-        
         userRepo.save(senderUser);
-        userRepo.save(recipientUser);
+        if(!sameOwner){
+            userRepo.save(recipientUser);
+        }
+
     }
 
 
     public Account withdrawAccount(Long accountId, double withdrawAmount){
+        if (withdrawAmount < 0){
+            throw new NegativeMoneyAmountException();
+        }
         var account = accountRepo.findById(accountId).orElseThrow(
             () -> new AccountNotFoundException(accountId)
         );

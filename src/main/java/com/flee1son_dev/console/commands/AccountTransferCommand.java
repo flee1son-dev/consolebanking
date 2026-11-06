@@ -23,7 +23,7 @@ public class AccountTransferCommand implements OperationCommand{
         scanner.nextLine();
 
         System.out.print("Enter targer account's ID: ");
-        Long recipiesAccountId = scanner.nextLong();
+        Long recipientAccountId = scanner.nextLong();
         scanner.nextLine();
 
         System.out.print("Enter amount to transfer: ");
@@ -32,7 +32,7 @@ public class AccountTransferCommand implements OperationCommand{
 
         if(
             senderAccountId <= 0 || senderAccountId == null ||
-            recipiesAccountId <= 0 || recipiesAccountId == null
+            recipientAccountId <= 0 || recipientAccountId == null
         ){
             System.out.println("Id cannot must be a null or empty");
             return; 
@@ -41,10 +41,10 @@ public class AccountTransferCommand implements OperationCommand{
             System.out.println("Amount cannot be a negative");
             return;
         }
-        accountService.transferAccount(senderAccountId, senderAccountId, amount);
+        accountService.transferAccount(senderAccountId, recipientAccountId, amount);
         System.out.println(
             "Amount " + amount + " transferred from account's ID " + 
-            senderAccountId + "from to account's ID " + recipiesAccountId + "\n"
+            senderAccountId + "from to account's ID " + recipientAccountId + "\n"
         );
     }
 
