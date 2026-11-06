@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.stereotype.Repository;
+
 import com.flee1son_dev.user.Account;
 
+@Repository
 public class AccountRepo {
     private final Map<Long, Account> accountMap = new HashMap<>();
 
