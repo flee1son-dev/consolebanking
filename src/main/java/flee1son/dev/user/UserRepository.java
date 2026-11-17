@@ -1,10 +1,12 @@
 package flee1son.dev.user;
 
+import flee1son.dev.user.exceptions.UserNotFound;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class UserRepository {
@@ -24,5 +26,9 @@ public class UserRepository {
 
     public List<User> findAllUsers() {
         return userMap.values().stream().toList();
+    }
+
+    public Optional<User> findUserById(int id){
+        return Optional.ofNullable(userMap.get(id));
     }
 }
