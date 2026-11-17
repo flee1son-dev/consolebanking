@@ -1,0 +1,28 @@
+package flee1son.dev.user;
+
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Repository
+public class UserRepository {
+    private final Map<Integer, User> userMap = new HashMap<Integer, User>();
+
+
+    public void save(User u){
+        userMap.put(u.getId(), u);
+    }
+
+    public boolean existsByLogin(User u){
+        if(userMap.containsValue(u)){
+            return true;
+        }
+        return false;
+    }
+
+    public List<User> findAllUsers() {
+        return userMap.values().stream().toList();
+    }
+}
