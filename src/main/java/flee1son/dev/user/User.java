@@ -25,7 +25,7 @@ public class User {
                 "id=" + id +
                 ", login='" + login + '\'' +
                 ", accountList=" + accountList +
-                '}';
+                "}\n" ;
     }
 
     @Override

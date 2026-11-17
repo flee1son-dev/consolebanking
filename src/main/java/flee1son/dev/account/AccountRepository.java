@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public class AccountRepository {
-    private final Map<Integer, Account> accountMap = new HashMap<Integer, Account>();
+    private final Map<Integer, Account> accountMap = new HashMap<>();
 
 
     public void save(Account a){

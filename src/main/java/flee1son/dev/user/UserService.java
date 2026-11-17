@@ -1,5 +1,6 @@
 package flee1son.dev.user;
 
+import flee1son.dev.account.Account;
 import flee1son.dev.account.AccountService;
 import flee1son.dev.user.exceptions.LoginByExistsException;
 import flee1son.dev.user.exceptions.UserExceptions;
@@ -21,7 +22,7 @@ public class UserService {
 
     public UserService(
             UserRepository userRepository,
-            @Lazy AccountService accountService
+            AccountService accountService
             ) {
         this.userRepository = userRepository;
         this.accountService = accountService;
@@ -36,14 +37,13 @@ public class UserService {
         User user = new User(
                 id,
                 login,
-                new ArrayList<>(
-                        Arrays.asList(accountService.createAccount(id))
-                )
+                new ArrayList<>()
         );
         if (userRepository.existsByLogin(user)){
             throw new LoginByExistsException();
         }
         userRepository.save(user);
+        Account account = accountService.createAccount(id);
 
         return user;
     }

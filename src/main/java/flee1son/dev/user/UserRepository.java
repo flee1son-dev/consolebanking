@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public class UserRepository {
-    private final Map<Integer, User> userMap = new HashMap<Integer, User>();
+    private final Map<Integer, User> userMap = new HashMap<>();
 
 
     public void save(User u){

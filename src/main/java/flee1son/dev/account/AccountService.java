@@ -5,6 +5,7 @@ import flee1son.dev.account.exceptions.AccountTransferException;
 import flee1son.dev.account.exceptions.CannotCloseLastAccountException;
 import flee1son.dev.account.exceptions.NegateMoneyException;
 import flee1son.dev.user.UserRepository;
+import flee1son.dev.user.exceptions.UserNotFound;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -37,7 +38,7 @@ public class AccountService {
                 accountProperties.getDefaultMoneyAmount()
         );
         var accounts = userRepository.findUserById(userId)
-                .orElseThrow()
+                .orElseThrow(() -> new UserNotFound(userId))
                 .getAccountList();
         accounts.add(account);
 
@@ -63,6 +64,10 @@ public class AccountService {
 
         userAccounts.set(idx, account);
 
+        System.out.println("Deposit: " + deposit + " to account " + account.getId() +
+                ". New balance: " + account.getMoneyAmount()
+                );
+
         return account;
     }
 
@@ -84,6 +89,11 @@ public class AccountService {
 
         account.setMoneyAmount(newMoneyAmount);
         userAccounts.set(idx, account);
+
+        System.out.println(
+                "Withdraw " + withdraw + " to account " + account.getId() +
+                        ". New balance: " + account.getMoneyAmount()
+        );
 
         return account;
     }
@@ -134,6 +144,13 @@ public class AccountService {
         senderUserAccounts.set(senderIdx, senderAccount);
         recipientUserAccounts.set(recipientIdx, recipientAccount);
 
+        System.out.println(
+                "Transfer completed from account " + senderAccountId + " to account " +
+                        recipientAccountId + ". Amount: " + transferAmount +
+                        ", Comission: " + comission + ". Recepeint received: " +
+                        (transferAmount - comission)
+        );
+
         return recipientAccount;
     }
 
@@ -146,16 +163,21 @@ public class AccountService {
         if(userAccounts.size() <= 1){
             throw new CannotCloseLastAccountException();
         }
-        if(account.getMoneyAmount() > 0) {
-            var otherUserAccount = userAccounts.stream()
-                    .filter(a -> a.getId() != accountId)
-                    .min(Comparator.comparing(Account::getId))
-                    .orElseThrow();
-            otherUserAccount.setMoneyAmount(account.getMoneyAmount() + otherUserAccount.getMoneyAmount());
-        }
+
+        var otherUserAccount = userAccounts.stream()
+                .filter(a -> a.getId() != accountId)
+                .min(Comparator.comparing(Account::getId))
+                .orElseThrow();
+        otherUserAccount.setMoneyAmount(account.getMoneyAmount() + otherUserAccount.getMoneyAmount());
+
         userAccounts.removeIf(a -> a.getId() == accountId);
         accountRepository.close(accountId);
 
+        System.out.println(
+                "Account " + account.getId() + " closed. " +
+                        "Remaining balance " + account.getMoneyAmount() +
+                        " transfered to " + otherUserAccount.getId()
+                );
 
     }
 }
