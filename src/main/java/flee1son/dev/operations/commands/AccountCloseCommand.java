@@ -3,6 +3,7 @@ package flee1son.dev.operations.commands;
 import flee1son.dev.account.AccountService;
 import flee1son.dev.operations.ConsoleOperationType;
 import flee1son.dev.operations.OperationCommand;
+import flee1son.dev.utils.ConsoleInputService;
 import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
@@ -10,19 +11,16 @@ import java.util.Scanner;
 @Component
 public class AccountCloseCommand implements OperationCommand {
     private final AccountService accountService;
-    private final Scanner scanner;
+    private final ConsoleInputService consoleInputService;
 
-    public AccountCloseCommand(AccountService accountService, Scanner scanner) {
+    public AccountCloseCommand(AccountService accountService, ConsoleInputService consoleInputService) {
         this.accountService = accountService;
-        this.scanner = scanner;
+        this.consoleInputService = consoleInputService;
     }
 
     @Override
     public void execute() {
-        System.out.print("Enter account's ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-
+        int id = consoleInputService.getIntFromUser("Enter account's ID: ");
         accountService.closeAccount(id);
     }
 

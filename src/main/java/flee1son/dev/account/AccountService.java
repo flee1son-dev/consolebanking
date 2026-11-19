@@ -44,6 +44,8 @@ public class AccountService {
 
         accountRepository.save(account);
 
+        System.out.println("Account succesfully created: " + account.toString());
+
         return account;
     }
 

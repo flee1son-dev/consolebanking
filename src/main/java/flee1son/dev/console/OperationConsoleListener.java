@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import flee1son.dev.operations.ConsoleOperationType;
 import flee1son.dev.operations.OperationCommand;
+import flee1son.dev.utils.ShutdownManager;
 import org.springframework.stereotype.Component;
 
 
@@ -15,17 +16,22 @@ import org.springframework.stereotype.Component;
 public class OperationConsoleListener implements Runnable{
     private final Map<ConsoleOperationType, OperationCommand> commandMap;
     private final Scanner scanner;
-    private volatile boolean running = true;
+    private final ShutdownManager shutdownManager;
 
-    public OperationConsoleListener(List<OperationCommand> commands, Scanner scanner) {
+    public OperationConsoleListener(
+            List<OperationCommand> commands,
+            Scanner scanner,
+            ShutdownManager shutdownManager
+    ) {
         this.scanner = scanner;
+        this.shutdownManager = shutdownManager;
         this.commandMap = new ConcurrentHashMap<>();
         commands.forEach(cmd -> commandMap.put(cmd.getOperationType(), cmd));
     }
 
     @Override
     public void run(){
-        while (running) {
+        while (shutdownManager.isRunning()) {
             System.out.println("Please enter one of operation type: ");
             for(ConsoleOperationType type : ConsoleOperationType.values()){
                 System.out.println(type);
@@ -35,11 +41,7 @@ public class OperationConsoleListener implements Runnable{
                 if(input.isEmpty()){
                     continue;
                 }
-                if("EXIT".equalsIgnoreCase(input)){
-                    running = false;
-                    System.out.println("Shutting down...");
-                    break;
-                }
+
                 ConsoleOperationType opType = ConsoleOperationType.valueOf(input.toUpperCase());
 
                 OperationCommand command = commandMap.get(opType);
@@ -50,6 +52,7 @@ public class OperationConsoleListener implements Runnable{
                     System.out.println("Command not implemented: " + opType);
                 }
 
+
             }catch(IllegalArgumentException e){
                 System.out.println("Unknown operation");
             }catch(Exception e){
@@ -59,7 +62,7 @@ public class OperationConsoleListener implements Runnable{
     }
 
     public void stop(){
-        running = false;
+        shutdownManager.shutdown();
     }
 }
 

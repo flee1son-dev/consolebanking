@@ -45,11 +45,15 @@ public class UserService {
         userRepository.save(user);
         Account account = accountService.createAccount(id);
 
+        System.out.println("User succesfully created: " + user.toString() + "\n");
         return user;
     }
 
     public List<User> getAllUsers(){
-        return userRepository.findAllUsers();
+        List<User> listUsers = userRepository.findAllUsers();
+
+        System.out.println("List of all users: " + listUsers);
+        return listUsers;
     }
 
 

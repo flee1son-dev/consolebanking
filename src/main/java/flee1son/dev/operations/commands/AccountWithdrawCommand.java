@@ -4,6 +4,7 @@ import flee1son.dev.account.Account;
 import flee1son.dev.account.AccountService;
 import flee1son.dev.operations.ConsoleOperationType;
 import flee1son.dev.operations.OperationCommand;
+import flee1son.dev.utils.ConsoleInputService;
 import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
@@ -11,29 +12,19 @@ import java.util.Scanner;
 @Component
 public class AccountWithdrawCommand implements OperationCommand {
     private final AccountService accountService;
-    private final Scanner scanner;
+    private final ConsoleInputService consoleInputService;
 
-    public AccountWithdrawCommand(AccountService accountService, Scanner scanner) {
+    public AccountWithdrawCommand(AccountService accountService, ConsoleInputService consoleInputService) {
         this.accountService = accountService;
-        this.scanner = scanner;
+        this.consoleInputService = consoleInputService;
     }
 
 
     @Override
     public void execute() {
-        System.out.print("Enter the account's ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter the withdraw amount: ");
-        double withdraw = scanner.nextDouble();
-        scanner.nextLine();
-
+        int id = consoleInputService.getIntFromUser("Enter the account's ID: ");
+        double withdraw = consoleInputService.getDoubleFromUser("Enter the withdraw amount: ");
         Account account = accountService.withdrawAccount(id, withdraw);
-
-        System.out.println(
-                "Withdraw " + withdraw + " to account " + account.getId() +
-                ". New balance: " + account.getMoneyAmount()
-        );
     }
 
     @Override
