@@ -1,16 +1,28 @@
 package sorokin.java.course.user;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
 import sorokin.java.course.account.Account;
 
+@Entity
+@Table(name = "users")
 public class User {
-    private final int id;
-    private final String login;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+
+    @Column(name = "user_login", nullable = false, unique = true)
+    private String login;
+
+    @OneToMany(mappedBy = "user")
     private List<Account> accountList;
 
-    public User(int id, String login, List<Account> accountList) {
-        this.id = id;
+    public User() {
+    }
+
+    public User(String login, List<Account> accountList) {
         this.login = login;
         this.accountList = accountList;
     }
