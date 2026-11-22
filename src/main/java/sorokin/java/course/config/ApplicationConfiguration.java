@@ -7,7 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import java.util.Scanner;
 
 @Configuration
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application-local.properties")
 public class ApplicationConfiguration {
 
     @Bean
