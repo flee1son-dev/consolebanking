@@ -1,47 +1,39 @@
 package sorokin.java.course.account;
 
 import org.springframework.stereotype.Component;
-import sorokin.java.course.account.Account;
 import sorokin.java.course.user.User;
 
-import java.util.HashMap;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Component
 public class AccountService {
 
-    private int idCounter;
-    private final Map<Integer, Account> accountMap;
     private final AccountProperties accountProperties;
+    private final AccountRepository accountRepository;
 
-    public AccountService(AccountProperties accountProperties) {
-        this.idCounter = 0;
-        this.accountMap = new HashMap<>();
+    public AccountService(AccountProperties accountProperties, AccountRepository accountRepository) {
         this.accountProperties = accountProperties;
+        this.accountRepository = accountRepository;
     }
 
     public Account createAccount(User user) {
         if (user == null) {
             throw new IllegalArgumentException("user must not be null");
         }
-        idCounter++;
-        Account newAccount = new Account(idCounter, user.getId(), accountProperties.getDefaultAmount());
-        accountMap.put(idCounter, newAccount);
+        Account newAccount = new Account(user, accountProperties.getDefaultAmount());
+        accountRepository.saveAccount(newAccount);
         return newAccount;
     }
 
     public Optional<Account> findAccountById(Integer id) {
         validatePositiveId(id, "account id");
-        return Optional.ofNullable(accountMap.get(id));
+        return Optional.ofNullable(accountRepository.findById(id));
     }
 
     public List<Account> getUserAccounts(Integer userId) {
-        return accountMap.values().stream()
-                .filter(it -> userId.equals(it.getUserId()))
-                .toList();
+        return accountRepository.findAll(userId);
     }
 
     public void withdraw(Integer fromAccountId, Integer amount) {
@@ -57,6 +49,7 @@ public class AccountService {
             );
         }
         account.setMoneyAmount(account.getMoneyAmount() - amount);
+        accountRepository.updateAccount(account);
     }
 
     public void deposit(Integer toAccountId, Integer amount) {
@@ -66,13 +59,14 @@ public class AccountService {
                 .orElseThrow(() -> new IllegalArgumentException("No such account: id=%s".formatted(toAccountId)));
 
         account.setMoneyAmount(account.getMoneyAmount() + amount);
+        accountRepository.updateAccount(account);
     }
 
     public Account closeAccount(Integer accountId) {
         validatePositiveId(accountId, "account id");
         Account accountToClose = findAccountById(accountId)
                 .orElseThrow(() -> new IllegalArgumentException("No such account: id=%s".formatted(accountId)));
-        var userId = accountToClose.getUserId();
+        var userId = accountToClose.getUser().getId();
         var userAccounts = getUserAccounts(userId);
         if (userAccounts.size() == 1) {
             throw new IllegalStateException("Can't close the only one account");
@@ -84,7 +78,8 @@ public class AccountService {
 
         var newAmount = Math.addExact(accountToTransferMoney.getMoneyAmount(), accountToClose.getMoneyAmount());
         accountToTransferMoney.setMoneyAmount(newAmount);
-        accountMap.remove(accountId);
+        accountRepository.updateAccount(accountToTransferMoney);
+        accountRepository.removeAccount(accountId);
         return accountToClose;
     }
 
@@ -106,13 +101,16 @@ public class AccountService {
                             .formatted(accountFrom.getId(), accountFrom.getMoneyAmount(), amount)
             );
         }
-        int amountToTransfer = accountTo.getUserId() == accountFrom.getUserId()
+        int amountToTransfer = accountTo.getUser().getId() == accountFrom.getUser().getId()
                 ? amount
                 : (int) Math.round(amount * (1 - accountProperties.getTransferCommission()));
         int sourceAfter = Math.subtractExact(accountFrom.getMoneyAmount(), amount);
         int targetAfter = Math.addExact(accountTo.getMoneyAmount(), amountToTransfer);
         accountFrom.setMoneyAmount(sourceAfter);
         accountTo.setMoneyAmount(targetAfter);
+
+        accountRepository.updateAccount(accountFrom);
+        accountRepository.updateAccount(accountTo);
     }
 
     private void validatePositiveId(Integer id, String fieldName) {

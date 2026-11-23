@@ -1,6 +1,5 @@
 package sorokin.java.course.user;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -16,7 +15,7 @@ public class User {
     @Column(name = "user_login", nullable = false, unique = true)
     private String login;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.PERSIST)
     private List<Account> accountList;
 
     public User() {

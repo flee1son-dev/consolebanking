@@ -4,6 +4,8 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import sorokin.java.course.account.Account;
+import sorokin.java.course.user.User;
 
 @Configuration
 public class HibernateConfiguration {
@@ -38,6 +40,8 @@ public class HibernateConfiguration {
                 new org.hibernate.cfg.Configuration();
         configuration
                 .addPackage("sorokin.java.course")
+                .addAnnotatedClass(User.class)
+                .addAnnotatedClass(Account.class)
                 .setProperty("hibernate.connection.driver_class", "org.postgresql.Driver")
                 .setProperty("hibernate.connection.url", dbUrl)
                 .setProperty("hibernate.connection.username", dbUsername)
