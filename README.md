@@ -1,6 +1,6 @@
 # Spring Core Bank Solution
 
-Консольное учебное банковское приложение на Java + Spring Core.
+Консольное учебное банковское приложение на Java, Spring Core, Hibernate Core .
 
 ## Что умеет
 - создавать пользователей;
@@ -14,12 +14,14 @@
 ## Технологии
 - Java 21
 - Spring Framework 7.0.10 (`spring-context`)
-- Конфигурация через `@Configuration`, `@PropertySource`, `@Component`
-- Хранение данных в памяти (`Map`)
+- Hibernate ORM 7.14.17.Final(`hibernate-core`)
+- Конфигурация через `@Configuration`, `@PropertySource`, `@Componentscan`
+- Хранение данных в базе данных (`PostgreSQL`)
 
 ## Архитектура
-- `User`, `Account` — POJO-модели.
-- `UserService`, `AccountService` — бизнес-логика и хранение данных.
+- `User`, `Account` — ORM-модели.
+- `UserService`, `AccountService` — бизнес-логика
+- `UserRepository`, `AccountRepository` – логика работы базы данных
 - `OperationCommand` + `ConsoleOperationType` — обработка команд (Command pattern).
 - `OperationsConsoleListener` — главный цикл приложения.
 - `ConsoleInput` — единая точка чтения/валидации консольного ввода.
@@ -40,6 +42,14 @@
 ```properties
 account.default-amount=500
 account.transfer-commission=0.02
+db.url = jdbc:postgresql://localhost:5432/`your_db_name`
+db.username = `your_db_username`
+db.password = `your_db_password`
+db.dialect=`your_db_dialect`
+hibernate.hbm2ddl.auto=`your_ddl`
+hibernate.show_sql=`true`
+hibernate.format_sql=`true`
+hibernate.current_session_context_class=`thread`
 ```
 
 ## Запуск
